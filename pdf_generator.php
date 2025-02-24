@@ -7,22 +7,44 @@ use Knp\Snappy\Pdf;
 
 $wkhtmltopdf_path = $_ENV['WKHTMLTOPDF_PATH'];
 
+$templates = [
+    'template_1' => 'template_1.php',
+    'template_2' => 'template_2.php',
+    'template_3' => 'template_3.php',
+];
+
+$templateId = isset($_GET['template']) ? $_GET['template'] : '';
+if (!array_key_exists($templateId, $templates)) {
+    die('Invalid template.');
+}
+
+if ($templateId === 'template_1') {
+    $customerName = "John Smith";
+    $invoiceDate  = date("Y-m-d");
+    $items        = [
+        ['name' => 'Item A', 'price' => '$10'],
+        ['name' => 'Item B', 'price' => '$20'],
+    ];
+    $totalAmount  = '$30';
+} elseif ($templateId === 'template_2') {
+    $reportMonth  = "August 2025";
+    $totalSales   = '$5000';
+    $orderCount   = 150;
+    $comments     = "Great performance!";
+} elseif ($templateId === 'template_3') {
+    $participantName = "Alice Johnson";
+    $courseName      = "PHP Development";
+    $completionDate  = date("Y-m-d");
+}
+
+ob_start();
+include $templates[$templateId];
+$html = ob_get_clean();
+
 $snappy = new Pdf($wkhtmltopdf_path);
 
-$html = '<html>
-            <head>
-                <title>Resume</title>
-                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-                <style> body { font-family: Arial; padding: 20px; } </style>
-            </head>
-            <body>
-                <h1>John Doe</h1>
-                <p>This is a sample resume.</p>
-            </body>
-         </html>';
-
 header('Content-Type: application/pdf');
-header('Content-Disposition: attachment; filename="resume.pdf"');
+header('Content-Disposition: attachment; filename="File.pdf"');
 
 echo $snappy->getOutputFromHtml($html, [
     'page-size'     => 'A4',
